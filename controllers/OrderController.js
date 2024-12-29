@@ -15,13 +15,13 @@ export const placeOrder = async (req, res) => {
     console.log("product", existingProduct);
     if (!existingProduct) {
       return res.status(404).json({
-        code: 404,
+        code: process.env.STATUS_CODE_NOT_FOUND,
         status: "Product not found",
       });
     }
     if (quantity <= 0 || price <= 0) {
       return res.status(400).json({
-        code: 400,
+        code: process.env.STATUS_CODE_BAD_REQUEST,
         status: "error",
         message: "Quantity or Price should be greater than zero",
       });
@@ -35,13 +35,13 @@ export const placeOrder = async (req, res) => {
       order_date,
     });
     res.status(201).json({
-      code: 201,
+      code: process.env.STATUS_CODE_CREATED,
       status: "success",
       message: "Order placed successfully.",
     });
   } catch (error) {
     res.status(500).json({
-      code: 500,
+      code: process.env.STATUS_CODE_INTERNAL_ERROR,
       status: "error",
       error: error.message,
     });
@@ -56,25 +56,29 @@ export const updateOrder = async (req, res) => {
     if (!order) {
       return res
         .status(404)
-        .json({ code: 404, status: "error", message: "Order does not exist." });
+        .json({
+          code: process.env.STATUS_CODE_NOT_FOUND,
+          status: "error",
+          message: "Order does not exist.",
+        });
     }
     if (order.status === "delivered" || order.status === "canceled") {
       return res.status(400).json({
-        code: 400,
+        code: process.env.STATUS_CODE_BAD_REQUEST,
         status: "error",
         message: "Cannot modify delivered or canceled orders.",
       });
     }
     if (quantity && quantity <= 0) {
       return res.status(400).json({
-        code: 400,
+        code: process.env.STATUS_CODE_BAD_REQUEST,
         status: "error",
         message: "Quantity must be positive.",
       });
     }
     if (price && price <= 0) {
       return res.status(400).json({
-        code: 400,
+        code: process.env.STATUS_CODE_BAD_REQUEST,
         status: "error",
         message: "Price must be positive.",
       });
@@ -85,14 +89,16 @@ export const updateOrder = async (req, res) => {
       price: price,
     });
     res.status(200).json({
-      code: 200,
+      code: process.env.STATUS_CODE_SUCCESS,
       status: "success",
       message: "Order updated successfully.",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ code: 500, status: "error", message: error.message });
+    res.status(500).json({
+      code: process.env.STATUS_CODE_INTERNAL_ERROR,
+      status: "error",
+      message: error.message,
+    });
   }
 };
 
@@ -105,12 +111,16 @@ export const cancelOrder = async (req, res) => {
     if (!order) {
       return res
         .status(404)
-        .json({ code: 404, status: "error", message: "Order does not exist." });
+        .json({
+          code: process.env.STATUS_CODE_NOT_FOUND,
+          status: "error",
+          message: "Order does not exist.",
+        });
     }
 
     if (order.status === "delivered") {
       return res.status(400).json({
-        code: 400,
+        code: process.env.STATUS_CODE_BAD_REQUEST,
         status: "error",
         message: "Cannot cancel a delivered order.",
       });
@@ -120,14 +130,16 @@ export const cancelOrder = async (req, res) => {
     await order.destroy();
 
     res.status(200).json({
-      code: 200,
+      code: process.env.STATUS_CODE_SUCCESS,
       status: "success",
       message: "Order canceled successfully.",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ code: 500, status: "error", message: error.message });
+    res.status(500).json({
+      code: process.env.STATUS_CODE_INTERNAL_ERROR,
+      status: "error",
+      message: error.message,
+    });
   }
 };
 
@@ -139,11 +151,10 @@ export const calculateTotalWithDiscounts = async (req, res) => {
     const orders = await Orders.findAll({
       where: { customer_id },
     });
-    console.log("orders", orders);
 
     if (orders.length === 0) {
       return res.status(404).json({
-        code: 404,
+        code: process.env.STATUS_CODE_NOT_FOUND,
         status: "error",
         message: "No active orders found for the customer.",
       });
@@ -162,7 +173,7 @@ export const calculateTotalWithDiscounts = async (req, res) => {
 
       // Apply discount if the order's total exceeds ₹5000
       if (orderTotal > 5000) {
-        orderDiscount = 0.1 * orderTotal; 
+        orderDiscount = 0.1 * orderTotal;
         orderFinalTotal = orderTotal - orderDiscount;
         totalAmount += orderTotal;
         finalTotal += orderFinalTotal;
@@ -181,8 +192,10 @@ export const calculateTotalWithDiscounts = async (req, res) => {
       data: orderDetails,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ code: 500, status: "error", message: error.message });
+    res.status(500).json({
+      code: process.env.STATUS_CODE_INTERNAL_ERROR,
+      status: "error",
+      message: error.message,
+    });
   }
 };

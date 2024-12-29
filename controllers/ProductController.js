@@ -10,13 +10,13 @@ export const createProduct = async (req, res) => {
     });
 
     res.status(201).json({
-      code: 201,
+      code: process.env.STATUS_CODE_CREATED,
       status: "Product created successfully!",
       product,
     });
   } catch (error) {
     res.status(500).json({
-      code:500,
+      code:process.env.STATUS_CODE_INTERNAL_ERROR,
       status: "Failed to create product",
       error: error.message,
     });
@@ -28,10 +28,10 @@ export const getAllProducts = async (req, res) => {
   try {
     const products = await Products.findAll();
 
-    res.status(200).json({ code: 200, data: products });
+    res.status(200).json({ code: process.env.STATUS_CODE_SUCCESS, data: products });
   } catch (error) {
     res.status(500).json({
-      code: 500,
+      code: process.env.STATUS_CODE_INTERNAL_ERROR,
       status: "Failed to fetch products",
       error: error.message,
     });
