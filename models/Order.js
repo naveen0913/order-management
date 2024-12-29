@@ -26,10 +26,6 @@ const Orders = sequelize.define("orders", {
   order_date: {
     type: DataTypes.DATEONLY,
   },
-  status:{
-    type:DataTypes.STRING,
-    defaultValue:"order placed"
-  }
 });
 
 export default Orders;
